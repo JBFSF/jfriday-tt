@@ -1,8 +1,8 @@
 module sqrt(
-    input logic [7:0] sqrt_i,
-    output logic [7:0] sqrt_o
+    input logic [3:0] sqrt_i,
+    output logic [3:0] sqrt_o
 );
-    logic [7:0] sqrt_table [256];
+    logic [3:0] sqrt_table [16];
     initial begin
         $readmemh ("../src/sqrt.memh", sqrt_table);
     end

@@ -9,11 +9,11 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+my project is a simple 4bit ALU with 4 operations, add, subtract, floor log2, and square root. it has 2 4 bit inputs a_i and b_i that are the inputs that get operated on and one 4 bit input operation_i that determines which operation the ALU executes via one hot encoding
 
 ## How to test
 
-Explain how to use your project
+run 'make' in the test directory to run the cocotb python test for the module, which runs random input operations on all the different operators in the module and checks their outputs
 
 ## External hardware
 
