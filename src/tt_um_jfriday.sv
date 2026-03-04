@@ -24,9 +24,9 @@ module tt_um_jfriday (
 
     always @(posedge clk) begin
         if (rst) begin
-            y_o = '0;
+            y_o <= '0;
         end else begin
-            y_o = (operation_i == 4'b0001) ? a_i + b_i :
+            y_o <= (operation_i == 4'b0001) ? a_i + b_i :
                     (operation_i == 4'b0010) ? a_i - b_i :
                     (operation_i == 4'b0100) ? flog2_o :
                     (operation_i == 4'b1000) ? sqrt_o : 0;
