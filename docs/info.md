@@ -13,7 +13,7 @@ my project is a simple 4bit ALU with 4 operations, add, subtract, floor log2, an
 
 ## How to test
 
-run 'make' in the test directory to run the cocotb python test for the module, which runs random input operations on all the different operators in the module and checks their outputs
+run 'make' in the test directory to run the cocotb python test for the module, which runs random input operations on all the different operators in the module and checks their outputs. The math is compared to python for the same inputs, masked to match the bits and done 10 test for each case, which covers most cases for a 4bit design.
 
 ## External hardware
 
