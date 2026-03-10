@@ -19,7 +19,7 @@ project:
   source_files:
     - "project.v"
     - "flog2.sv"
-    - "sqrt.sv"
+    - "sqrt.v"
     - "sqrt.memh"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
