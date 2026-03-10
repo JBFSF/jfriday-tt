@@ -8,62 +8,88 @@ import random
 import math
 
 
+def pack_inputs(a, b):
+    return (b << 4) | a
+
+
+def get_y(dut):
+    return int(dut.uo_out.value) & 0xF
+
+
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 10 us (100 KHz)
     clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
+    dut.ena.value = 1
+
     # Reset
     dut._log.info("Reset")
-    dut.a_i.value = random.randint(0,15)
-    dut.b_i.value = random.randint(0,15)
-    dut.operation_i.value = 0
-    dut.rst.value = 1
+    dut.ui_in.value = pack_inputs(random.randint(0,15), random.randint(0,15))
+    dut.uio_in.value = 0
+
+    dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
-    dut.rst.value = 0
+    dut.rst_n.value = 1
 
     dut._log.info("Test project behavior")
 
-    # Set the input values you want to test
-    dut.operation_i.value = 0
-    for i in range(10):
-        dut.a_i.value = random.randint(0,15)
-        dut.b_i.value = random.randint(0,15)
+    # Operation = 0 (default case)
+    dut.uio_in.value = 0
+    for _ in range(10):
+        a = random.randint(0,15)
+        b = random.randint(0,15)
+
+        dut.ui_in.value = pack_inputs(a, b)
+
         await ClockCycles(dut.clk, 1)
-        assert dut.y_o.value == 0
 
-    dut.operation_i.value = 1
-    for i in range(10):
-        a_i = random.randint(0,15)
-        b_i = random.randint(0,15)
-        dut.a_i.value = a_i
-        dut.b_i.value = b_i
-        await ClockCycles(dut.clk, 2)
-        assert dut.y_o.value == (a_i + b_i) & 0xF
-        
-    dut.operation_i.value = 2
-    for i in range(10):
-        a_i = random.randint(0,15)
-        b_i = random.randint(0,15)
-        dut.a_i.value = a_i
-        dut.b_i.value = b_i
-        await ClockCycles(dut.clk, 2)
-        assert dut.y_o.value == (a_i - b_i) & 0xF
-    
-    dut.operation_i.value = 4
-    for i in range(10):
-        a_i = random.randint(0,15)
-        dut.a_i.value = a_i
-        await ClockCycles(dut.clk, 2)
-        assert dut.y_o.value == int(math.log2(a_i))
-        
-    dut.operation_i.value = 8
-    for i in range(10):
-        a_i = random.randint(0,15)
-        dut.a_i.value = a_i
-        await ClockCycles(dut.clk, 2)
-        assert dut.y_o.value == round(math.sqrt(a_i))
+        assert get_y(dut) == 0
 
+    # ADD
+    dut.uio_in.value = 1
+    for _ in range(10):
+        a = random.randint(0,15)
+        b = random.randint(0,15)
+
+        dut.ui_in.value = pack_inputs(a, b)
+
+        await ClockCycles(dut.clk, 2)
+
+        assert get_y(dut) == ((a + b) & 0xF)
+
+    # SUB
+    dut.uio_in.value = 2
+    for _ in range(10):
+        a = random.randint(0,15)
+        b = random.randint(0,15)
+
+        dut.ui_in.value = pack_inputs(a, b)
+
+        await ClockCycles(dut.clk, 2)
+
+        assert get_y(dut) == ((a - b) & 0xF)
+
+    # LOG2
+    dut.uio_in.value = 4
+    for _ in range(10):
+        a = random.randint(1,15)   # avoid log2(0)
+
+        dut.ui_in.value = pack_inputs(a, 0)
+
+        await ClockCycles(dut.clk, 2)
+
+        assert get_y(dut) == int(math.log2(a))
+
+    # SQRT
+    dut.uio_in.value = 8
+    for _ in range(10):
+        a = random.randint(0,15)
+
+        dut.ui_in.value = pack_inputs(a, 0)
+
+        await ClockCycles(dut.clk, 2)
+
+        assert get_y(dut) == round(math.sqrt(a))
